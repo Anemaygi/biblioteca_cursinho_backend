@@ -15,14 +15,14 @@ const pool = new Pool({
   }
 });
 
-app.get("/url", (req, res, next) => {
- res.json(["Tony","Lisa","Michael","Ginger","Food"]);
+app.get("/", (req, res, next) => {
+ res.json(["Teste1", "Está rodando"]);
 });
 
 
-app.get("/usuarios", async (req, res) => {
+app.get("/teste", async (req, res) => {
   try {
-    const result = await pool.query("SELECT nome FROM usuarios");
+    const result = await pool.query("SELECT nome FROM teste_usuarios");
     res.json(result.rows); 
   } catch (err) {
     console.error("Erro ao consultar banco:", err);
