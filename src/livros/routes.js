@@ -5,5 +5,7 @@ const router = Router();
 
 router.get('/', controller.getAll);
 router.post('/', controller.addLivro);
+router.put('/:id', controller.editLivro);
+
 
 module.exports = router;

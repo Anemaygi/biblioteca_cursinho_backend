@@ -56,8 +56,35 @@ const addLivro = async (req, res) => {
     }
 };
 
+const editLivro = async (req, res) => {
+    const { id } = req.params;
+    const { isbn, titulo, editora, edicao, categoria } = req.body;
+
+    try {
+        const result = await pool.query(queries.update, [
+            isbn,
+            titulo,
+            editora,
+            edicao,
+            categoria,
+            id
+        ]);
+
+        if (result.rowCount === 0) {
+            return res.status(404).send("Livro não encontrado");
+        }
+
+        const livroAtualizado = utils.formatarLivro(result.rows[0]);
+        res.json(livroAtualizado);
+    } catch (err) {
+        console.error("Erro ao atualizar livro:", err);
+        res.status(500).send("Erro ao atualizar livro");
+    }
+};
+
 
 module.exports = {
     getAll,
-    addLivro
+    addLivro,
+    editLivro
 }
