@@ -11,7 +11,7 @@ function formatarUsuario(usuario) {
   return {
     id: usuario.id,
     nome: usuario.nome,
-    email: usuario.email,
+    gmail: usuario.gmail,
     telefone: usuario.telefone,
     status: usuario.status ? 'Regular' : 'Bloqueado',
     cpf: parseInt(usuario.cpf),
