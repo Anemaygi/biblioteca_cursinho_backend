@@ -1,13 +1,22 @@
-const getAll = `SELECT 
+const getAll = `
+  SELECT 
     l.*,
     COUNT(e.codigo) AS total_exemplares,
-    COUNT(*) FILTER (WHERE e.status_disponibilidade = TRUE) AS exemplares_disponiveis
-FROM 
+    COUNT(*) FILTER (WHERE e.status_disponibilidade = TRUE) AS exemplares_disponiveis,
+    COALESCE(
+      JSON_AGG(DISTINCT JSONB_BUILD_OBJECT('id', a.id, 'nome', a.nome))
+      FILTER (WHERE a.id IS NOT NULL),
+      '[]'
+    ) AS autores
+  FROM 
     livro l
-LEFT JOIN 
-    exemplar e ON e.livro_id = l.id
-GROUP BY 
-    l.id;`;
+  LEFT JOIN exemplar e ON e.livro_id = l.id
+  LEFT JOIN livro_autor la ON la.livro_id = l.id
+  LEFT JOIN autor a ON a.id = la.autor_id
+  GROUP BY l.id;
+`;
+
+
 
 const insert = `
   INSERT INTO livro (isbn, titulo, editora, edicao, categoria)
