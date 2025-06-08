@@ -6,6 +6,7 @@ const cors = require("cors");
 const usuariosRoutes = require('./src/usuarios/routes')
 const livrosRoutes = require('./src/livros/routes')
 const exemplaresRoutes = require('./src/exemplares/routes')
+const loginRoutes = require('./src/login/routes')
 
 const app = express();
 app.use(express.json());
@@ -18,6 +19,7 @@ app.get("/", (req, res) => {
 app.use('/usuarios', usuariosRoutes);
 app.use('/livros', livrosRoutes);
 app.use('/exemplares', exemplaresRoutes);
+app.use('/login', loginRoutes);
 
 
 
