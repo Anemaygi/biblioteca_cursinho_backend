@@ -82,9 +82,27 @@ const editLivro = async (req, res) => {
     }
 };
 
+const removeLivro = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const result = await pool.query(queries.remove, [id]);
+
+        if (result.rowCount === 0) {
+            return res.status(404).send("Livro não encontrado");
+        }
+
+        res.status(200).send("Livro removido com sucesso");
+    } catch (err) {
+        console.error("Erro ao remover livro:", err);
+        res.status(500).send("Erro ao remover livro");
+    }
+};
+
 
 module.exports = {
     getAll,
     addLivro,
-    editLivro
+    editLivro,
+    removeLivro
 }

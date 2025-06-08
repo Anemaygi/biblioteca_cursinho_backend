@@ -26,9 +26,16 @@ const update = `
   RETURNING *;
 `;
 
+const remove = `
+  DELETE FROM livro
+  WHERE id = $1
+  RETURNING *;
+`;
+
 
 module.exports = {
     getAll,
     insert, 
-    update
+    update, 
+    remove
 }

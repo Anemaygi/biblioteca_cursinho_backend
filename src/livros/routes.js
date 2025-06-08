@@ -6,6 +6,6 @@ const router = Router();
 router.get('/', controller.getAll);
 router.post('/', controller.addLivro);
 router.put('/:id', controller.editLivro);
-
+router.delete('/:id', controller.removeLivro);
 
 module.exports = router;
