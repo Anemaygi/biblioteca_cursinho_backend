@@ -14,8 +14,18 @@ const insert = `
   RETURNING *;
 `;
 
+const hasEmprestimosAtivos = `
+  SELECT 1
+  FROM exemplar e
+  JOIN emprestimo emp ON emp.exemplar_codigo = e.codigo
+  WHERE e.livro_id = $1 AND emp.data_devolucao IS NULL
+  LIMIT 1;
+`;
+
+
 module.exports = {
   countByLivroId,
   insert,
-  remove
+  remove,
+  hasEmprestimosAtivos
 };

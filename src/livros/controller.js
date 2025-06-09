@@ -227,17 +227,35 @@ const importarCsv = async (req, res) => {
 const removeByIsbn = async (req, res) => {
   const { isbn } = req.params;
 
-  try {
-    const result = await pool.query(queries.removeByIsbn, [isbn]);
+  const client = await pool.connect();
 
-    if (result.rowCount === 0) {
+  try {
+    await client.query('BEGIN');
+
+    const livroResult = await client.query(`SELECT id FROM livro WHERE isbn = $1`, [isbn]);
+    if (livroResult.rowCount === 0) {
+      await client.query('ROLLBACK');
       return res.status(404).send("Livro não encontrado");
     }
 
+    const livroId = livroResult.rows[0].id;
+
+    const emprestimoAtivo = await client.query(exemplarQueries.hasEmprestimosAtivos, [livroId]);
+    if (emprestimoAtivo.rowCount > 0) {
+      await client.query('ROLLBACK');
+      return res.status(409).send("Este livro possui exemplares com empréstimos ativos.");
+    }
+
+    const deleteResult = await client.query(queries.removeByIsbn, [isbn]);
+
+    await client.query('COMMIT');
     res.status(200).send("Livro removido com sucesso");
   } catch (err) {
+    await client.query('ROLLBACK');
     console.error("Erro ao remover livro por ISBN:", err);
     res.status(500).send("Erro ao remover livro");
+  } finally {
+    client.release();
   }
 };
 
