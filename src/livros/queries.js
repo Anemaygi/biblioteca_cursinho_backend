@@ -16,7 +16,12 @@ const getAll = `
   GROUP BY l.id;
 `;
 
-
+const vincularAutor = `
+  INSERT INTO livro_autor (livro_id, autor_id)
+  VALUES ($1, $2)
+  ON CONFLICT DO NOTHING
+  RETURNING *;
+`;
 
 const insert = `
   INSERT INTO livro (isbn, titulo, editora, edicao, categoria)
@@ -46,5 +51,6 @@ module.exports = {
     getAll,
     insert, 
     update, 
-    remove
+    remove,
+    vincularAutor
 }

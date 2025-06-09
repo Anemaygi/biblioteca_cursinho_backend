@@ -99,10 +99,27 @@ const removeLivro = async (req, res) => {
     }
 };
 
+const adicionarAutorAoLivro = async (req, res) => {
+  const { livroId, autorId } = req.body;
+
+  try {
+    const result = await pool.query(queries.vincularAutor, [livroId, autorId]);
+
+    if (result.rowCount === 0) {
+      return res.status(200).send("Associação já existente");
+    }
+
+    res.status(201).json({ message: "Autor vinculado ao livro com sucesso" });
+  } catch (err) {
+    console.error("Erro ao vincular autor ao livro:", err);
+    res.status(500).send("Erro ao vincular autor ao livro");
+  }
+};
 
 module.exports = {
     getAll,
     addLivro,
     editLivro,
-    removeLivro
+    removeLivro,
+    adicionarAutorAoLivro
 }
