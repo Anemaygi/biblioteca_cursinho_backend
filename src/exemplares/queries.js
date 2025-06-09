@@ -4,8 +4,18 @@ const remove = `
   RETURNING *;
 `;
 
+const countByLivroId = `
+  SELECT COUNT(*) FROM exemplar WHERE livro_id = $1;
+`;
 
+const insert = `
+  INSERT INTO exemplar (codigo, livro_id, status_disponibilidade)
+  VALUES ($1, $2, TRUE)
+  RETURNING *;
+`;
 
 module.exports = {
-    remove
-}
+  countByLivroId,
+  insert,
+  remove
+};
