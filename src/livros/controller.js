@@ -116,10 +116,29 @@ const adicionarAutorAoLivro = async (req, res) => {
   }
 };
 
+const getByIsbnCompleto = async (req, res) => {
+  const { isbn } = req.params;
+
+  try {
+    const result = await pool.query(queries.getByIsbnCompleto, [isbn]);
+
+    if (result.rowCount === 0) {
+      return res.status(404).send("Livro não encontrado");
+    }
+
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error("Erro ao buscar livro por ISBN:", err);
+    res.status(500).send("Erro ao buscar livro");
+  }
+};
+
+
 module.exports = {
     getAll,
     addLivro,
     editLivro,
     removeLivro,
-    adicionarAutorAoLivro
+    adicionarAutorAoLivro,
+    getByIsbnCompleto
 }

@@ -46,11 +46,33 @@ const remove = `
   RETURNING *;
 `;
 
+const getByIsbnCompleto = `
+  SELECT 
+    l.*,
+    COALESCE(
+      JSON_AGG(DISTINCT JSONB_BUILD_OBJECT('id', a.id, 'nome', a.nome))
+      FILTER (WHERE a.id IS NOT NULL),
+      '[]'
+    ) AS autores,
+    COALESCE(
+      JSON_AGG(DISTINCT JSONB_BUILD_OBJECT('codigo', e.codigo, 'status_disponibilidade', e.status_disponibilidade))
+      FILTER (WHERE e.codigo IS NOT NULL),
+      '[]'
+    ) AS exemplares
+  FROM livro l
+  LEFT JOIN livro_autor la ON la.livro_id = l.id
+  LEFT JOIN autor a ON a.id = la.autor_id
+  LEFT JOIN exemplar e ON e.livro_id = l.id
+  WHERE l.isbn = $1
+  GROUP BY l.id;
+`;
+
 
 module.exports = {
     getAll,
     insert, 
     update, 
     remove,
-    vincularAutor
+    vincularAutor,
+    getByIsbnCompleto
 }

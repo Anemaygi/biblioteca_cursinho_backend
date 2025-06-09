@@ -7,6 +7,8 @@ router.get('/', controller.getAll);
 router.post('/', controller.addLivro);
 router.put('/:id', controller.editLivro);
 router.delete('/:id', controller.removeLivro);
-router.post('/autor', controller.adicionarAutorAoLivro); // POST /livros/autor
+router.post('/autor', controller.adicionarAutorAoLivro); 
+router.get('/isbn/:isbn', controller.getByIsbnCompleto);
+
 
 module.exports = router;
