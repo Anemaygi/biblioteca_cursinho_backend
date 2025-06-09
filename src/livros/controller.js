@@ -246,7 +246,7 @@ const removeByIsbn = async (req, res) => {
       return res.status(409).send("Este livro possui exemplares com empréstimos ativos.");
     }
 
-    const deleteResult = await client.query(queries.removeByIsbn, [isbn]);
+    await client.query(queries.removeByIsbn, [isbn]);
 
     await client.query('COMMIT');
     res.status(200).send("Livro removido com sucesso");
