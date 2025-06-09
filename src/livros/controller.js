@@ -224,6 +224,24 @@ const importarCsv = async (req, res) => {
 };
 
 
+const removeByIsbn = async (req, res) => {
+  const { isbn } = req.params;
+
+  try {
+    const result = await pool.query(queries.removeByIsbn, [isbn]);
+
+    if (result.rowCount === 0) {
+      return res.status(404).send("Livro não encontrado");
+    }
+
+    res.status(200).send("Livro removido com sucesso");
+  } catch (err) {
+    console.error("Erro ao remover livro por ISBN:", err);
+    res.status(500).send("Erro ao remover livro");
+  }
+};
+
+
 
 module.exports = {
     getAll,
@@ -232,5 +250,6 @@ module.exports = {
     removeLivro,
     adicionarAutorAoLivro,
     getByIsbnCompleto,
-    importarCsv
+    importarCsv,
+    removeByIsbn
 }

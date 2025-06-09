@@ -73,6 +73,13 @@ const insertFromCsv = `
   ON CONFLICT (isbn) DO NOTHING;
 `;
 
+const removeByIsbn = `
+  DELETE FROM livro
+  WHERE isbn = $1
+  RETURNING *;
+`;
+
+
 module.exports = {
     getAll,
     insert, 
@@ -80,5 +87,6 @@ module.exports = {
     remove,
     vincularAutor,
     getByIsbnCompleto,
-    insertFromCsv
+    insertFromCsv,
+    removeByIsbn
 }

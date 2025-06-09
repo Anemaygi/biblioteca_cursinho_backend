@@ -12,6 +12,6 @@ router.delete('/:id', controller.removeLivro);
 router.post('/autor', controller.adicionarAutorAoLivro); 
 router.get('/isbn/:isbn', controller.getByIsbnCompleto);
 router.post('/import', upload.single('arquivo'), controller.importarCsv);
-
+router.delete('/isbn/:isbn', controller.removeByIsbn);
 
 module.exports = router;
