@@ -67,6 +67,11 @@ const getByIsbnCompleto = `
   GROUP BY l.id;
 `;
 
+const insertFromCsv = `
+  INSERT INTO livro (isbn, titulo, editora, edicao, categoria)
+  VALUES ($1, $2, $3, $4, $5)
+  ON CONFLICT (isbn) DO NOTHING;
+`;
 
 module.exports = {
     getAll,
@@ -74,5 +79,6 @@ module.exports = {
     update, 
     remove,
     vincularAutor,
-    getByIsbnCompleto
+    getByIsbnCompleto,
+    insertFromCsv
 }

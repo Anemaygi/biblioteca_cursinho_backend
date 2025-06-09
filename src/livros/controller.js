@@ -1,6 +1,11 @@
 const queries = require('./queries');
 const utils = require('./utils');
 const pool = require('../config/db');
+const fs = require('fs');
+const csv = require('csv-parser');
+
+const autorQueries = require('../autores/queries');
+const exemplarQueries = require('../exemplares/queries');
 
 const getAll = async (req,res) => {
     try{
@@ -133,6 +138,92 @@ const getByIsbnCompleto = async (req, res) => {
   }
 };
 
+const importarCsv = async (req, res) => {
+  const resultados = [];
+
+  try {
+    fs.createReadStream(req.file.path)
+      .pipe(csv())
+      .on('data', (row) => resultados.push(row))
+      .on('end', async () => {
+        const client = await pool.connect();
+
+        try {
+          await client.query('BEGIN');
+
+          for (const row of resultados) {
+            const {
+              isbn,
+              titulo,
+              editora,
+              edicao,
+              categoria,
+              autores,
+              quantidade_exemplares
+            } = row;
+
+            const resultLivro = await client.query(queries.insertFromCsv, [
+              isbn,
+              titulo,
+              editora,
+              parseInt(edicao),
+              categoria
+            ]);
+
+            let livro = resultLivro.rows[0];
+            if (!livro) {
+              const buscaLivro = await client.query(
+                `SELECT * FROM livro WHERE isbn = $1`,
+                [isbn]
+              );
+              livro = buscaLivro.rows[0];
+              if (!livro) continue;
+            }
+
+            const nomesAutores = autores.split(',').map((nome) => nome.trim());
+
+            for (const nome of nomesAutores) {
+              let resultAutor = await client.query(autorQueries.getByNome, [nome]);
+              let autor = resultAutor.rows[0];
+
+              if (!autor) {
+                const insertAutor = await client.query(autorQueries.insert, [nome]);
+                autor = insertAutor.rows[0];
+              }
+
+              await client.query(queries.vincularAutor, [livro.id, autor.id]);
+            }
+
+            const total = parseInt(quantidade_exemplares);
+            for (let i = 1; i <= total; i++) {
+              const codigo = `${livro.id}-${i}`;
+              await client.query(exemplarQueries.insert, [codigo, livro.id]);
+            }
+          }
+
+          await client.query('COMMIT');
+
+          fs.unlink(req.file.path, (err) => {
+            if (err) console.warn('Erro ao apagar arquivo temporário:', err);
+          });
+
+          res.send(`Importação concluída. ${resultados.length} livros processados.`);
+        } catch (err) {
+          await client.query('ROLLBACK');
+          fs.unlink(req.file.path, () => {}); 
+          console.error('Erro durante importação:', err);
+          res.status(500).send('Erro durante importação');
+        } finally {
+          client.release();
+        }
+      });
+  } catch (err) {
+    console.error('Erro no processamento do arquivo:', err);
+    res.status(500).send('Erro ao processar CSV');
+  }
+};
+
+
 
 module.exports = {
     getAll,
@@ -140,5 +231,6 @@ module.exports = {
     editLivro,
     removeLivro,
     adicionarAutorAoLivro,
-    getByIsbnCompleto
+    getByIsbnCompleto,
+    importarCsv
 }

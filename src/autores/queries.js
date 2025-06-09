@@ -27,10 +27,16 @@ const remove = `
   RETURNING *;
 `;
 
+const getByNome = `
+  SELECT * FROM autor
+  WHERE nome = $1;
+`;
+
 module.exports = {
   getAll,
   getById,
   insert,
   update,
-  remove
+  remove,
+  getByNome
 };
