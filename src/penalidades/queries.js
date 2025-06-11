@@ -1,87 +1,48 @@
-const db = require('../db') // seu cliente do banco (ex: pg Pool)
+const getAll = `
+  SELECT p.*, u.nome AS usuario_nome, t.tipo, c.causa
+  FROM penalidade p
+  LEFT JOIN usuario u ON p.usuario_id = u.id
+  LEFT JOIN tipo_penalidade t ON p.tipo_id = t.id
+  LEFT JOIN causa_penalidade c ON p.causa_id = c.id
+  ORDER BY p.data DESC;
+`;
 
-async function listarPenalidades() {
-  return db.query('SELECT * FROM penalidades')
-}
+const insert = `
+  INSERT INTO penalidade (usuario_id, tipo_id, causa_id, descricao, data, cumprida)
+  VALUES ($1, $2, $3, $4, $5, FALSE)
+  RETURNING *;
+`;
 
-async function criarPenalidade(penalidade) {
-  const {
-    usuario_id,
-    exemplar_codigo,
-    emprestimo_data_inicio,
-    data_aplicacao,
-    tipo_id,
-    causa_id,
-    status_cumprida
-  } = penalidade
+const update = `
+  UPDATE penalidade
+  SET usuario_id = $1, tipo_id = $2, causa_id = $3, descricao = $4, data = $5, cumprida = $6
+  WHERE id = $7
+  RETURNING *;
+`;
 
-  const res = await db.query(
-    `INSERT INTO penalidades
-    (usuario_id, exemplar_codigo, emprestimo_data_inicio, data_aplicacao, tipo_id, causa_id, status_cumprida)
-    VALUES ($1, $2, $3, $4, $5, $6, $7)
-    RETURNING *`,
-    [usuario_id, exemplar_codigo, emprestimo_data_inicio, data_aplicacao, tipo_id, causa_id, status_cumprida]
-  )
+const remove = `
+  DELETE FROM penalidade
+  WHERE id = $1
+  RETURNING *;
+`;
 
-  return res.rows[0]
-}
+const markCumprida = `
+  UPDATE penalidade
+  SET cumprida = TRUE
+  WHERE id = $1
+  RETURNING *;
+`;
 
-async function atualizarPenalidade(usuario_id, exemplar_codigo, emprestimo_data_inicio, data_aplicacao, dados) {
-  const { status_cumprida } = dados
-
-  const res = await db.query(
-    `UPDATE penalidades SET status_cumprida = $1
-    WHERE usuario_id = $2 AND exemplar_codigo = $3 AND emprestimo_data_inicio = $4 AND data_aplicacao = $5
-    RETURNING *`,
-    [status_cumprida, usuario_id, exemplar_codigo, emprestimo_data_inicio, data_aplicacao]
-  )
-
-  return res.rows[0]
-}
-
-async function removerPenalidade(usuario_id, exemplar_codigo, emprestimo_data_inicio, data_aplicacao) {
-  return db.query(
-    `DELETE FROM penalidades
-    WHERE usuario_id = $1 AND exemplar_codigo = $2 AND emprestimo_data_inicio = $3 AND data_aplicacao = $4`,
-    [usuario_id, exemplar_codigo, emprestimo_data_inicio, data_aplicacao]
-  )
-}
-
-async function listarUsuarios() {
-  return db.query('SELECT id, nome, cpf FROM usuarios')
-}
-
-async function listarTiposPenalidade() {
-  return db.query('SELECT id, nome FROM penalidade_tipo')
-}
-
-async function listarCausasPenalidade() {
-  return db.query('SELECT id, nome FROM penalidade_causa')
-}
-
-async function listarEmprestimosUsuario(usuario_id) {
-  return db.query(
-    `SELECT exemplar_codigo, data_inicio FROM emprestimos
-    WHERE usuario_id = $1 AND ativo = true`,
-    [usuario_id]
-  )
-}
-
-async function inativarExemplar(exemplar_codigo) {
-  return db.query(
-    `UPDATE exemplares SET ativo = false WHERE codigo = $1`,
-    [exemplar_codigo]
-  )
-}
+const getByUsuario = `
+  SELECT * FROM penalidade
+  WHERE usuario_id = $1;
+`;
 
 module.exports = {
-  listarPenalidades,
-  criarPenalidade,
-  atualizarPenalidade,
-  removerPenalidade,
-  listarUsuarios,
-  listarTiposPenalidade,
-  listarCausasPenalidade,
-  listarEmprestimosUsuario,
-  inativarExemplar,
-}
+  getAll,
+  insert,
+  update,
+  remove,
+  markCumprida,
+  getByUsuario,
+};
