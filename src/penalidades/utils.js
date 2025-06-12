@@ -1,15 +1,16 @@
-function formatarPenalidade(penalidade) {
+function formatarPenalidade(p) {
   return {
-    id: penalidade.id,
-    usuarioId: penalidade.usuario_id,
-    usuarioNome: penalidade.usuario_nome,
-    tipoId: penalidade.tipo_id,
-    tipo: penalidade.tipo,
-    causaId: penalidade.causa_id,
-    causa: penalidade.causa,
-    descricao: penalidade.descricao,
-    data: penalidade.data,
-    cumprida: penalidade.cumprida,
+    usuarioId: p.usuario_id,
+    exemplarCodigo: p.exemplar_codigo,
+    emprestimoDataInicio: p.emprestimo_data_inicio,
+    dataAplicacao: p.data_aplicacao,
+    dataSuspensao: p.data_suspensao,
+    tipoId: p.tipo_id,
+    tipo: p.tipo,
+    causaId: p.causa_id,
+    causa: p.causa,
+    statusCumprida: p.status_cumprida,
+    usuarioNome: p.usuario_nome,
   };
 }
 
