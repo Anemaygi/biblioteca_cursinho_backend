@@ -5,9 +5,9 @@ const router = Router();
 
 router.get('/', controller.getAll);
 router.post('/', controller.addPenalidade);
-router.put('/:id', controller.editPenalidade);
-router.delete('/:id', controller.removePenalidade);
-router.patch('/:id/cumprida', controller.marcarCumprida);
 router.get('/usuario/:usuario_id', controller.getByUsuario);
+router.put('/:usuario_id/:exemplar_codigo/:emprestimo_data_inicio/:data_aplicacao', controller.editPenalidade);
+router.delete('/:usuario_id/:exemplar_codigo/:emprestimo_data_inicio/:data_aplicacao', controller.removePenalidade);
+router.patch('/:usuario_id/:exemplar_codigo/:emprestimo_data_inicio/:data_aplicacao/cumprida', controller.marcarCumprida);
 
 module.exports = router;
