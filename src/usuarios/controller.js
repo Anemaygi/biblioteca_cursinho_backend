@@ -171,6 +171,45 @@ const remove = async (req, res) => {
   }
 };
 
+const createBatch = async (req, res) => {
+  const { usuarios } = req.body;
+
+  if (!usuarios || !Array.isArray(usuarios) || usuarios.length === 0) {
+    return res.status(400).json({ message: 'Nenhum usuário fornecido ou formato inválido.' });
+  }
+
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN'); // Inicia a transação
+
+    for (const usuario of usuarios) {
+      const { nome, cpf, gmail, telefone, cep, logradouro, numero, complemento } = usuario;
+
+      // Validação mínima dos dados
+      if (!nome || !cpf || !gmail || !cep || !logradouro || !numero) {
+        throw new Error(`Dados obrigatórios faltando para o usuário ${nome || cpf}`);
+      }
+
+      // 1. Cria o usuário e obtém o ID de retorno
+      const userResult = await client.query(queries.createUser, [nome, cpf, gmail, telefone || null]);
+      const newUserId = userResult.rows[0].id;
+
+      // 2. Cria o endereço usando o ID do novo usuário
+      await client.query(queries.createAddress, [newUserId, cep, logradouro, numero, complemento || null]);
+    }
+
+    await client.query('COMMIT'); // Confirma a transação se tudo deu certo
+    res.status(201).json({ message: `${usuarios.length} usuários adicionados com sucesso!` });
+
+  } catch (error) {
+    await client.query('ROLLBACK'); // Desfaz tudo se ocorrer qualquer erro
+    console.error('Erro na inserção em lote:', error);
+    res.status(500).json({ message: error.message || 'Erro interno ao processar o lote de usuários.' });
+  } finally {
+    client.release(); // Libera a conexão de volta para o pool
+  }
+};
+
 
 module.exports = {
   getAll,
@@ -178,5 +217,6 @@ module.exports = {
   create,
   update,
   remove,
-  getById
+  getById,
+  createBatch
 };
