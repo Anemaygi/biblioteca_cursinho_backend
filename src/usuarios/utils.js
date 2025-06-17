@@ -7,21 +7,24 @@ function formatarEndereco(logradouro, numero, complemento, cep) {
   return endereco;
 }
 
+// utils.js
 function formatarUsuario(usuario) {
   return {
     id: usuario.id,
     nome: usuario.nome,
-    gmail: usuario.gmail,
+    cpf: usuario.cpf,
+    gmail: usuario.gmail, // Campo email/gmail deve estar correto
     telefone: usuario.telefone,
-    status: usuario.status ? 'Regular' : 'Bloqueado',
-    cpf: parseInt(usuario.cpf),
+    status: usuario.status_regularidade === true || usuario.status_regularidade === 't' || usuario.status_regularidade === '1' ? 'Regular' : 'Bloqueado',
     address: formatarEndereco(
-      usuario.logradouro,
-      usuario.numero,
-      usuario.complemento,
+      usuario.logradouro, 
+      usuario.numero, 
+      usuario.complemento, 
       usuario.cep
-    ),
+    )
   };
 }
+
+
 
 module.exports = { formatarUsuario };

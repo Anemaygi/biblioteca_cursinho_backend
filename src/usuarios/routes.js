@@ -12,6 +12,8 @@ router.get('/atrasados', controller.getAtrasados);
 router.post('/', controller.create);
 router.put('/:id', controller.update);
 router.delete('/:id', controller.remove);
+router.get('/:id', controller.getById); 
+
 
 
 module.exports = router;
