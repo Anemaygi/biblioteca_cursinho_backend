@@ -121,10 +121,13 @@ const getByUsuario = async (req, res) => {
 };
 
 module.exports = {
+  // já existentes:
   getAll,
   addPenalidade,
   editPenalidade,
   removePenalidade,
   marcarCumprida,
   getByUsuario,
-};
+  getTipos,
+  getCausas,
+}
