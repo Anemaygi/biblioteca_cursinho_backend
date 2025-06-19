@@ -1,7 +1,13 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
-const usuariosRoutes = require('./src/usuarios/routes');
+
+const usuariosRoutes = require('./src/usuarios/routes')
+const livrosRoutes = require('./src/livros/routes')
+const exemplaresRoutes = require('./src/exemplares/routes')
+const loginRoutes = require('./src/login/routes')
+const autoresRoutes = require('./src/autores/routes');
+const penalidadesRoutes = require('./src/penalidades/routes');
 
 const app = express();
 
@@ -16,9 +22,16 @@ app.get("/", (req, res) => {
 
 // Rotas de usuários
 app.use('/usuarios', usuariosRoutes);
+app.use('/livros', livrosRoutes);
+app.use('/exemplares', exemplaresRoutes);
+app.use('/login', loginRoutes);
+app.use('/autores', autoresRoutes);
+app.use('/penalidade', penalidadesRoutes);
 
-// Inicia servidor
-const PORT = process.env.PORT || 3001;
+
+
+
+const PORT = process.env.PORT || 3999;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
