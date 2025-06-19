@@ -46,6 +46,12 @@ const updateAddress = `UPDATE endereco
                        WHERE usuario_id = $5
                        RETURNING *`;
 
+const searchUsers = `
+  SELECT id, nome, cpf FROM usuario
+  WHERE nome ILIKE $1 OR cpf ILIKE $1
+  LIMIT 10
+`;
+
 module.exports = {
   getAll,
   getAtrasados,
@@ -54,5 +60,6 @@ module.exports = {
   deleteUser,
   createAddress,
   updateAddress,
-  getUserById
+  getUserById,
+  searchUsers
 }
