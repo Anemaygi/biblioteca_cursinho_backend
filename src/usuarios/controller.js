@@ -186,7 +186,7 @@ const createBatch = async (req, res) => {
       const { nome, cpf, gmail, telefone, cep, logradouro, numero, complemento } = usuario;
 
       // Validação mínima dos dados
-      if (!nome || !cpf || !gmail || !cep || !logradouro || !numero) {
+      if (!nome || !cpf || !gmail || !telefone || !cep || !logradouro || !numero) {
         throw new Error(`Dados obrigatórios faltando para o usuário ${nome || cpf}`);
       }
 
