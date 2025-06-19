@@ -1,5 +1,4 @@
 require("dotenv").config();
-
 const express = require("express");
 const cors = require("cors");
 
@@ -11,13 +10,17 @@ const autoresRoutes = require('./src/autores/routes');
 const penalidadesRoutes = require('./src/penalidades/routes');
 
 const app = express();
-app.use(express.json());
-app.use(cors());
 
+// Middlewares ESSENCIAIS (ordem importa!)
+app.use(express.json()); // <-- Parseia JSON primeiro
+app.use(cors()); // <-- Habilita CORS depois
+
+// Rota raiz
 app.get("/", (req, res) => {
   res.send("Backend da Biblioteca do Cursinho. Feito por Ana Clara, Giane e Giovanna");
 });
 
+// Rotas de usuários
 app.use('/usuarios', usuariosRoutes);
 app.use('/livros', livrosRoutes);
 app.use('/exemplares', exemplaresRoutes);
