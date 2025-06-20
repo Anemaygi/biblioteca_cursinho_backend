@@ -259,15 +259,41 @@ const removeByIsbn = async (req, res) => {
   }
 };
 
+const getExemplaresIndisponiveis = async (req, res) => {
+  const { isbn } = req.params;
+  const client = await pool.connect();
+
+  try {
+    const livroResult = await client.query("SELECT id FROM livro WHERE isbn = $1", [isbn]);
+    if (livroResult.rows.length === 0) {
+      return res.json([]);
+    }
+    const livroId = livroResult.rows[0].id;
+
+    // A lógica da query foi invertida para status_disponibilidade = false
+    const exemplaresResult = await client.query(
+      "SELECT codigo FROM exemplar WHERE livro_id = $1 AND status_disponibilidade = false",
+      [livroId]
+    );
+    res.json(exemplaresResult.rows);
+
+  } catch (error) {
+    console.error("Erro ao buscar exemplares indisponíveis:", error);
+    res.status(500).json({ message: 'Erro interno no servidor.' });
+  } finally {
+    client.release();
+  }
+};
 
 
 module.exports = {
-    getAll,
-    addLivro,
-    editLivro,
-    removeLivro,
-    adicionarAutorAoLivro,
-    getByIsbnCompleto,
-    importarCsv,
-    removeByIsbn
+  getAll,
+  addLivro,
+  editLivro,
+  removeLivro,
+  adicionarAutorAoLivro,
+  getByIsbnCompleto,
+  importarCsv,
+  removeByIsbn,
+  getExemplaresIndisponiveis,
 }

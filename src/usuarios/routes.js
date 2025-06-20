@@ -10,10 +10,12 @@ app.use(express.json());
 const router = Router();
 
 router.get('/', controller.getAll);
+router.get('/search', controller.searchUsuarios); 
 router.get('/atrasados', controller.getAtrasados);
 router.get('/:id', controller.getById);
+
 router.post('/', controller.create);
-router.post('/batch', controller.createBatch); // A rota agora chama a função no controller
+router.post('/batch', controller.createBatch); 
 router.put('/:id', controller.update);
 router.delete('/:id', controller.remove);
 

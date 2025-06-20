@@ -2,7 +2,6 @@ const queries = require('./queries');
 const utils = require('./utils');
 const pool = require('../config/db');
 
-
 function formatarEndereco(logradouro, numero, complemento, cep) {
   let endereco = `${logradouro}, ${numero}`;
   if (complemento) {
@@ -40,7 +39,6 @@ const getById = async (req, res) => {
 
     res.json(usuario);
   } catch (err) {
-    await client.query('ROLLBACK');
     console.error("Erro ao atualizar usuário:", err);
     res.status(500).json({ message: "Erro no banco de dados", detalhe: err.detail || err.message });
   }
@@ -210,6 +208,20 @@ const createBatch = async (req, res) => {
   }
 };
 
+const searchUsuarios = async (req, res) => {
+  const searchTerm = req.query.q; 
+  if (!searchTerm) {
+    return res.json([]);
+  }
+
+  try {
+    const result = await pool.query(queries.searchUsers, [`%${searchTerm}%`]);
+    res.json(result.rows);
+  } catch (error) {
+    console.error("Erro ao buscar usuários:", error);
+    res.status(500).json({ message: "Erro no servidor" });
+  }
+};
 
 module.exports = {
   getAll,
@@ -218,5 +230,6 @@ module.exports = {
   update,
   remove,
   getById,
-  createBatch
+  createBatch,
+  searchUsuarios
 };
