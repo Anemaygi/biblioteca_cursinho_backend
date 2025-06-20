@@ -1,6 +1,15 @@
-// src/reservas/controller.js
-const pool = require('../config/db'); // Ajuste o caminho se necessário
+const pool = require('../config/db');
 const queries = require('./queries');
+
+const getAllReservas = async (req, res) => {
+    try {
+        const { rows } = await pool.query(queries.getAllReservas);
+        res.status(200).json(rows);
+    } catch (error) {
+        console.error('Erro ao buscar reservas:', error);
+        res.status(500).json({ message: 'Erro ao buscar reservas.' });
+    }
+};
 
 const createReserva = async (req, res) => {
     const { usuario_id, exemplar_codigo, data_efetuacao } = req.body;
@@ -22,22 +31,22 @@ const createReserva = async (req, res) => {
 
         const isDisponivel = exemplarResult.rows[0].status_disponibilidade;
 
-        if (isDisponivel) { // se for TRUE
+        if (isDisponivel) {
             return res.status(400).json({ message: "Este exemplar está disponível e não pode ser reservado." });
         }
-        await client.query('BEGIN'); // Inicia transação
 
-        // Insere a nova reserva
+        await client.query('BEGIN');
+
         const result = await client.query(queries.createReserva, [usuario_id, exemplar_codigo, data_efetuacao]);
 
-        await client.query('COMMIT'); // Confirma a transação
+        await client.query('COMMIT');
         res.status(201).json(result.rows[0]);
 
     } catch (error) {
-        await client.query('ROLLBACK'); // Desfaz em caso de erro
-        console.error(error); // O erro original do banco será impresso logo abaixo
+        await client.query('ROLLBACK');
+        console.error(error);
         if (error.code === '23505') {
-            return res.status(409).json({ message: 'Este usuário já possui uma reserva para este exemplar.' }); // 409 Conflict é mais apropriado
+            return res.status(409).json({ message: 'Este usuário já possui uma reserva para este exemplar.' });
         }
         res.status(500).json({ message: 'Erro ao criar reserva.' });
     } finally {
@@ -47,4 +56,5 @@ const createReserva = async (req, res) => {
 
 module.exports = {
     createReserva,
+    getAllReservas,
 };
