@@ -9,6 +9,7 @@ const loginRoutes = require('./src/login/routes')
 const autoresRoutes = require('./src/autores/routes');
 const penalidadesRoutes = require('./src/penalidades/routes');
 const reservasRoutes = require('./src/reservas/routes');
+const emprestimosRoutes = require('./src/emprestimos/routes')
 
 const app = express();
 
@@ -29,6 +30,7 @@ app.use('/login', loginRoutes);
 app.use('/autores', autoresRoutes);
 app.use('/penalidade', penalidadesRoutes);
 app.use('/reservas', reservasRoutes);
+app.use('/emprestimos', emprestimosRoutes)
 
 
 

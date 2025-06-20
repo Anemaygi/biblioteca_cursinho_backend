@@ -11,6 +11,7 @@ function formatarPenalidade(p) {
     causa: p.causa,
     statusCumprida: p.status_cumprida,
     usuarioNome: p.usuario_nome,
+    tituloLivro: p.titulo_livro,
   };
 }
 

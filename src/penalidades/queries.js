@@ -1,11 +1,14 @@
 const getAll = `
-  SELECT p.*, u.nome AS usuario_nome, t.nome AS tipo, c.nome AS causa
+  SELECT p.*, u.nome AS usuario_nome, t.nome AS tipo, c.nome AS causa, l.titulo AS titulo_livro
   FROM penalidade p
   LEFT JOIN usuario u ON p.usuario_id = u.id
   LEFT JOIN penalidade_tipo t ON p.tipo_id = t.id
   LEFT JOIN penalidade_causa c ON p.causa_id = c.id
+  LEFT JOIN exemplar e ON p.exemplar_codigo = e.codigo
+  LEFT JOIN livro l ON e.livro_id = l.id
   ORDER BY p.data_aplicacao DESC;
 `;
+
 
 const insert = `
   INSERT INTO penalidade (
