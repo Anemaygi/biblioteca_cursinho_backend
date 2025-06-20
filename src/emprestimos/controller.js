@@ -1,6 +1,7 @@
 const pool = require('../config/db');
 const queries = require('./queries');
 
+// Já existe
 const getAll = async (req, res) => {
   try {
     const { rows } = await pool.query(queries.getAllEmprestimos);
@@ -11,17 +12,19 @@ const getAll = async (req, res) => {
   }
 };
 
+// DELETE: excluir empréstimo
 const deleteEmprestimo = async (req, res) => {
-  const { usuario_id, exemplar_codigo, data_inicio } = req.body;
+  const { usuario_id, exemplar_codigo, data_inicio } = req.params;
   try {
     await pool.query(queries.deleteEmprestimo, [usuario_id, exemplar_codigo, data_inicio]);
-    res.status(200).send("Empréstimo deletado com sucesso");
+    res.status(200).send("Empréstimo excluído com sucesso");
   } catch (err) {
-    console.error("Erro ao deletar empréstimo:", err);
-    res.status(500).send("Erro ao deletar empréstimo");
+    console.error("Erro ao excluir empréstimo:", err);
+    res.status(500).send("Erro ao excluir empréstimo");
   }
 };
 
+// PATCH: renovar empréstimo
 const renovarEmprestimo = async (req, res) => {
   const { usuario_id, exemplar_codigo, data_inicio } = req.body;
   try {
@@ -36,5 +39,5 @@ const renovarEmprestimo = async (req, res) => {
 module.exports = {
   getAll,
   deleteEmprestimo,
-  renovarEmprestimo
+  renovarEmprestimo,
 };
