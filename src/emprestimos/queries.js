@@ -17,13 +17,16 @@ const getAllEmprestimos = `
 const deleteEmprestimo = `
   DELETE FROM emprestimo
   WHERE usuario_id = $1 AND exemplar_codigo = $2 AND data_inicio = $3
+  RETURNING *;
 `;
 
 const renovarEmprestimo = `
   UPDATE emprestimo
-  SET renovado = TRUE,
-      data_fim_previsto = data_fim_previsto + INTERVAL '10 days'
+  SET 
+    renovado = TRUE,
+    data_fim_previsto = data_fim_previsto + INTERVAL '10 days'
   WHERE usuario_id = $1 AND exemplar_codigo = $2 AND data_inicio = $3
+  RETURNING *;
 `;
 
 module.exports = {

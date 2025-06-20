@@ -13,8 +13,20 @@ const getAll = async (req, res) => {
 
 const deleteEmprestimo = async (req, res) => {
   const { usuario_id, exemplar_codigo, data_inicio } = req.params;
+  const dataFormatada = data_inicio.split('T')[0]; // Remove parte do tempo
+
   try {
-    await pool.query(queries.deleteEmprestimo, [usuario_id, exemplar_codigo, data_inicio]);
+    const result = await pool.query(queries.deleteEmprestimo, [
+      usuario_id,
+      exemplar_codigo,
+      dataFormatada
+    ]);
+
+    if (result.rowCount === 0) {
+      console.warn("Nenhuma linha deletada — verifique os parâmetros.");
+      return res.status(404).send("Empréstimo não encontrado");
+    }
+
     res.status(200).send("Empréstimo deletado com sucesso");
   } catch (err) {
     console.error("Erro ao deletar empréstimo:", err);
@@ -24,8 +36,19 @@ const deleteEmprestimo = async (req, res) => {
 
 const renovarEmprestimo = async (req, res) => {
   const { usuario_id, exemplar_codigo, data_inicio } = req.params;
+  const dataFormatada = data_inicio.split('T')[0];
+
   try {
-    await pool.query(queries.renovarEmprestimo, [usuario_id, exemplar_codigo, data_inicio]);
+    const result = await pool.query(queries.renovarEmprestimo, [
+      usuario_id,
+      exemplar_codigo,
+      dataFormatada
+    ]);
+
+    if (result.rowCount === 0) {
+      return res.status(404).send("Empréstimo não encontrado para renovação");
+    }
+
     res.status(200).send("Empréstimo renovado com sucesso");
   } catch (err) {
     console.error("Erro ao renovar empréstimo:", err);
