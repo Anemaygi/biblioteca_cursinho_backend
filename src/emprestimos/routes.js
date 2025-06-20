@@ -1,8 +1,11 @@
-const { Router } = require('express')
-const controller = require('./controller')
+// routes/emprestimosRoutes.ts
+import { Router } from 'express'
+import * as emprestimosController from '../controllers/emprestimosController'
 
 const router = Router()
 
-router.get('/', controller.getAll)
+router.get('/emprestimos', emprestimosController.listarEmprestimos)
+router.patch('/emprestimos/:usuario_id/:exemplar_codigo/:data_inicio/renovar', emprestimosController.renovarEmprestimo)
+router.delete('/emprestimos/:usuario_id/:exemplar_codigo/:data_inicio', emprestimosController.excluirEmprestimo)
 
-module.exports = router
+export default router
