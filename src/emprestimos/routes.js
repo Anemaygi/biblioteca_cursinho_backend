@@ -5,8 +5,10 @@ const router = Router();
 
 router.get('/', controller.getAll);
 
-// Rotas corrigidas para usar parâmetros na URL:
+// DELETE com parâmetros na URL
 router.delete('/:usuario_id/:exemplar_codigo/:data_inicio', controller.deleteEmprestimo);
+
+// PATCH para renovação
 router.patch('/:usuario_id/:exemplar_codigo/:data_inicio/renovar', controller.renovarEmprestimo);
 
 module.exports = router;
