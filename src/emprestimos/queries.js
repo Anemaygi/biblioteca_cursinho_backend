@@ -16,9 +16,7 @@ const getAllEmprestimos = `
 
 const deleteEmprestimo = `
   DELETE FROM emprestimo
-  WHERE usuario_id = $1
-    AND exemplar_codigo = $2
-    AND data_inicio::date = $3::date
+  WHERE usuario_id = $1 AND exemplar_codigo = $2 AND data_inicio = $3
   RETURNING *;
 `;
 
@@ -27,14 +25,30 @@ const renovarEmprestimo = `
   SET 
     renovado = TRUE,
     data_fim_previsto = data_fim_previsto + INTERVAL '10 days'
-  WHERE usuario_id = $1
-    AND exemplar_codigo = $2
-    AND data_inicio::date = $3::date
+  WHERE usuario_id = $1 AND exemplar_codigo = $2 AND data_inicio = $3
   RETURNING *;
+`;
+
+const adicionarEmprestimo = `
+  INSERT INTO emprestimo (
+    usuario_id,
+    exemplar_codigo,
+    data_inicio,
+    data_fim_previsto
+  ) VALUES ($1, $2, $3, $4)
+  RETURNING *;
+`;
+
+const atualizarStatusExemplar = `
+  UPDATE exemplar
+  SET status_disponibilidade = FALSE
+  WHERE codigo = $1;
 `;
 
 module.exports = {
   getAllEmprestimos,
   deleteEmprestimo,
-  renovarEmprestimo
+  renovarEmprestimo,
+  adicionarEmprestimo,
+  atualizarStatusExemplar
 };
