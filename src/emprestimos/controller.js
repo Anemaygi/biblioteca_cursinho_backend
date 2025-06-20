@@ -12,7 +12,7 @@ const getAll = async (req, res) => {
 };
 
 const deleteEmprestimo = async (req, res) => {
-  const { usuario_id, exemplar_codigo, data_inicio } = req.body;
+  const { usuario_id, exemplar_codigo, data_inicio } = req.params;
   try {
     await pool.query(queries.deleteEmprestimo, [usuario_id, exemplar_codigo, data_inicio]);
     res.status(200).send("Empréstimo deletado com sucesso");
@@ -23,7 +23,7 @@ const deleteEmprestimo = async (req, res) => {
 };
 
 const renovarEmprestimo = async (req, res) => {
-  const { usuario_id, exemplar_codigo, data_inicio } = req.body;
+  const { usuario_id, exemplar_codigo, data_inicio } = req.params;
   try {
     await pool.query(queries.renovarEmprestimo, [usuario_id, exemplar_codigo, data_inicio]);
     res.status(200).send("Empréstimo renovado com sucesso");
