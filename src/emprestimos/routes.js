@@ -5,10 +5,10 @@ const router = Router();
 
 router.get('/', controller.getAll);
 
-// DELETE com parâmetros na URL
+// DELETE: /emprestimos/:usuario_id/:exemplar_codigo/:data_inicio
 router.delete('/:usuario_id/:exemplar_codigo/:data_inicio', controller.deleteEmprestimo);
 
-// PATCH para renovação
+// PATCH: /emprestimos/:usuario_id/:exemplar_codigo/:data_inicio/renovar
 router.patch('/:usuario_id/:exemplar_codigo/:data_inicio/renovar', controller.renovarEmprestimo);
 
 module.exports = router;
