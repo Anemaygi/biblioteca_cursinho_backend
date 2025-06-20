@@ -16,7 +16,9 @@ const getAllEmprestimos = `
 
 const deleteEmprestimo = `
   DELETE FROM emprestimo
-  WHERE usuario_id = $1 AND exemplar_codigo = $2 AND data_inicio = $3
+  WHERE usuario_id = $1
+    AND exemplar_codigo = $2
+    AND data_inicio::date = $3::date
   RETURNING *;
 `;
 
@@ -25,7 +27,9 @@ const renovarEmprestimo = `
   SET 
     renovado = TRUE,
     data_fim_previsto = data_fim_previsto + INTERVAL '10 days'
-  WHERE usuario_id = $1 AND exemplar_codigo = $2 AND data_inicio = $3
+  WHERE usuario_id = $1
+    AND exemplar_codigo = $2
+    AND data_inicio::date = $3::date
   RETURNING *;
 `;
 
