@@ -1,36 +1,16 @@
-// controllers/emprestimosController.ts
-import { Request, Response } from 'express'
-import * as emprestimosQueries from '../queries/emprestimosQueries'
+const pool = require('../config/db')
+const queries = require('./queries')
 
-export async function listarEmprestimos(req: Request, res: Response) {
+const getAll = async (req, res) => {
   try {
-    const emprestimos = await emprestimosQueries.getEmprestimosComNomes()
-    res.json(emprestimos)
+    const { rows } = await pool.query(queries.getAllEmprestimos)
+    res.status(200).json(rows)
   } catch (err) {
-    res.status(500).json({ error: 'Erro ao buscar empréstimos' })
+    console.error("Erro ao buscar empréstimos:", err)
+    res.status(500).send("Erro ao buscar empréstimos")
   }
 }
 
-export async function renovarEmprestimo(req: Request, res: Response) {
-  const { usuario_id, exemplar_codigo, data_inicio } = req.params
-
-  try {
-    await emprestimosQueries.renovarEmprestimo(usuario_id, exemplar_codigo, data_inicio)
-    res.sendStatus(204)
-  } catch (err) {
-    console.error(err)
-    res.status(500).json({ error: 'Erro ao renovar empréstimo' })
-  }
-}
-
-export async function excluirEmprestimo(req: Request, res: Response) {
-  const { usuario_id, exemplar_codigo, data_inicio } = req.params
-
-  try {
-    await emprestimosQueries.excluirEmprestimo(usuario_id, exemplar_codigo, data_inicio)
-    res.sendStatus(204)
-  } catch (err) {
-    console.error(err)
-    res.status(500).json({ error: 'Erro ao excluir empréstimo' })
-  }
+module.exports = {
+  getAll
 }
