@@ -45,10 +45,21 @@ const atualizarStatusExemplar = `
   WHERE codigo = $1;
 `;
 
+const marcarComoDevolvido = `
+  UPDATE emprestimo
+  SET data_devolucao = CURRENT_DATE
+  WHERE usuario_id = $1 AND exemplar_codigo = $2 AND data_inicio = $3;
+
+  UPDATE exemplar
+  SET status_disponibilidade = TRUE
+  WHERE codigo = $2;
+`;
+
 module.exports = {
   getAllEmprestimos,
   deleteEmprestimo,
   renovarEmprestimo,
   adicionarEmprestimo,
-  atualizarStatusExemplar
+  atualizarStatusExemplar,
+  marcarComoDevolvido
 };

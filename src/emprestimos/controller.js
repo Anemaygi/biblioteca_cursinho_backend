@@ -59,7 +59,6 @@ const adicionarEmprestimo = async (req, res) => {
   const { usuario_id, exemplar_codigo, data_inicio, data_fim_previsto } = req.body;
 
   try {
-    // 1. Inserir empréstimo
     await pool.query('BEGIN');
 
     const emprestimo = await pool.query(queries.adicionarEmprestimo, [
@@ -69,7 +68,6 @@ const adicionarEmprestimo = async (req, res) => {
       data_fim_previsto
     ]);
 
-    // 2. Atualizar status do exemplar
     await pool.query(queries.atualizarStatusExemplar, [exemplar_codigo]);
 
     await pool.query('COMMIT');
@@ -82,9 +80,33 @@ const adicionarEmprestimo = async (req, res) => {
   }
 };
 
+const marcarComoDevolvido = async (req, res) => {
+  const { usuario_id, exemplar_codigo, data_inicio } = req.params;
+  const dataFormatada = data_inicio.split('T')[0];
+
+  try {
+    await pool.query('BEGIN');
+
+    await pool.query(queries.marcarComoDevolvido, [
+      usuario_id,
+      exemplar_codigo,
+      dataFormatada
+    ]);
+
+    await pool.query('COMMIT');
+
+    res.status(200).send("Empréstimo marcado como devolvido");
+  } catch (err) {
+    await pool.query('ROLLBACK');
+    console.error("Erro ao marcar como devolvido:", err);
+    res.status(500).send("Erro ao marcar como devolvido");
+  }
+};
+
 module.exports = {
   getAll,
   deleteEmprestimo,
   renovarEmprestimo,
-  adicionarEmprestimo
+  adicionarEmprestimo,
+  marcarComoDevolvido
 };
