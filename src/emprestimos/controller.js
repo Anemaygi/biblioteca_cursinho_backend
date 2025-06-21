@@ -1,23 +1,10 @@
 const pool = require('../config/db');
 const queries = require('./queries');
 
-// Corrigir as datas retornadas para o frontend, para garantir que as datas sejam exibidas corretamente.
-const formatarDataParaExibicao = (data) => {
-  if (!data) return null;
-  const dataObj = new Date(data);
-  return dataObj.toLocaleDateString('pt-BR');
-};
-
 const getAll = async (req, res) => {
   try {
     const { rows } = await pool.query(queries.getAllEmprestimos);
-    const emprestimos = rows.map(emprestimo => ({
-      ...emprestimo,
-      data_inicio: formatarDataParaExibicao(emprestimo.data_inicio),
-      data_fim_previsto: formatarDataParaExibicao(emprestimo.data_fim_previsto),
-      data_devolucao: formatarDataParaExibicao(emprestimo.data_devolucao),
-    }));
-    res.status(200).json(emprestimos);
+    res.status(200).json(rows);
   } catch (err) {
     console.error("Erro ao buscar empréstimos:", err);
     res.status(500).send("Erro ao buscar empréstimos");
@@ -26,7 +13,7 @@ const getAll = async (req, res) => {
 
 const deleteEmprestimo = async (req, res) => {
   const { usuario_id, exemplar_codigo, data_inicio } = req.params;
-  const dataFormatada = data_inicio.split('T')[0];
+  const dataFormatada = data_inicio.split('T')[0];  // Garantir que a data esteja no formato 'YYYY-MM-DD'
 
   try {
     const result = await pool.query(queries.deleteEmprestimo, [
@@ -48,7 +35,7 @@ const deleteEmprestimo = async (req, res) => {
 
 const renovarEmprestimo = async (req, res) => {
   const { usuario_id, exemplar_codigo, data_inicio } = req.params;
-  const dataFormatada = data_inicio.split('T')[0];
+  const dataFormatada = data_inicio.split('T')[0];  // Garantir o formato 'YYYY-MM-DD'
 
   try {
     const result = await pool.query(queries.renovarEmprestimo, [
@@ -95,7 +82,7 @@ const adicionarEmprestimo = async (req, res) => {
 
 const marcarComoDevolvido = async (req, res) => {
   const { usuario_id, exemplar_codigo, data_inicio } = req.params;
-  const dataFormatada = data_inicio.split('T')[0];
+  const dataFormatada = data_inicio.split('T')[0];  // Garantir o formato 'YYYY-MM-DD'
 
   try {
     await pool.query('BEGIN');
