@@ -93,15 +93,18 @@ const removePenalidade = async (req, res) => {
 
 const marcarCumprida = async (req, res) => {
   const { usuario_id, exemplar_codigo, emprestimo_data_inicio, data_aplicacao } = req.params;
-  const hoje = new Date().toISOString().split('T')[0];
+  const hoje = new Date().toISOString().split('T')[0]; // Data atual no formato YYYY-MM-DD
 
   try {
     const result = await pool.query(`
       UPDATE penalidade
-      SET status = TRUE,
-          "data_suspensão" = COALESCE("data_suspensão", $5)
-      WHERE "fk_usuário_id" = $1 AND "fk_livro_id" = $2 
-        AND "fk_empréstimo_data_início" = $3 AND "data_aplicada" = $4
+      SET status_cumprida = TRUE,
+          "data_suspensao" = CASE
+            WHEN "data_suspensao" IS NULL THEN $5  -- Preencher data_suspensao se estiver NULL
+            ELSE "data_suspensao"  -- Caso contrário, não mexer
+          END
+      WHERE "usuario_id" = $1 AND "exemplar_codigo" = $2 
+        AND "emprestimo_data_inicio" = $3 AND "data_aplicacao" = $4
       RETURNING *;
     `, [usuario_id, exemplar_codigo, emprestimo_data_inicio, data_aplicacao, hoje]);
 
