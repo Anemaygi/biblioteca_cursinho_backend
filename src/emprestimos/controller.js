@@ -4,16 +4,33 @@ const queries = require('./queries');
 const getAll = async (req, res) => {
   try {
     const { rows } = await pool.query(queries.getAllEmprestimos);
-    res.status(200).json(rows);
+
+    // Garantir que as datas sejam convertidas corretamente para string no formato 'YYYY-MM-DD'
+    const emprestimos = rows.map(emprestimo => ({
+      ...emprestimo,
+      data_inicio: formatDate(emprestimo.data_inicio),
+      data_fim_previsto: formatDate(emprestimo.data_fim_previsto),
+      data_devolucao: emprestimo.data_devolucao ? formatDate(emprestimo.data_devolucao) : null,
+    }));
+
+    res.status(200).json(emprestimos);
   } catch (err) {
     console.error("Erro ao buscar empréstimos:", err);
     res.status(500).send("Erro ao buscar empréstimos");
   }
 };
 
+// Função para garantir que a data seja formatada corretamente
+function formatDate(date) {
+  if (date instanceof Date) {
+    return date.toISOString().split('T')[0];  // Formato 'YYYY-MM-DD'
+  }
+  return date; // Caso a data já esteja no formato correto, retorna sem alteração
+}
+
 const deleteEmprestimo = async (req, res) => {
   const { usuario_id, exemplar_codigo, data_inicio } = req.params;
-  const dataFormatada = data_inicio.split('T')[0];  // Garantir que a data esteja no formato 'YYYY-MM-DD'
+  const dataFormatada = formatDate(data_inicio);
 
   try {
     const result = await pool.query(queries.deleteEmprestimo, [
@@ -35,7 +52,7 @@ const deleteEmprestimo = async (req, res) => {
 
 const renovarEmprestimo = async (req, res) => {
   const { usuario_id, exemplar_codigo, data_inicio } = req.params;
-  const dataFormatada = data_inicio.split('T')[0];  // Garantir o formato 'YYYY-MM-DD'
+  const dataFormatada = formatDate(data_inicio);
 
   try {
     const result = await pool.query(queries.renovarEmprestimo, [
@@ -58,14 +75,18 @@ const renovarEmprestimo = async (req, res) => {
 const adicionarEmprestimo = async (req, res) => {
   const { usuario_id, exemplar_codigo, data_inicio, data_fim_previsto } = req.body;
 
+  // Garantir que as datas estejam no formato 'YYYY-MM-DD'
+  const dataInicioFormatada = formatDate(data_inicio);
+  const dataFimPrevistoFormatada = formatDate(data_fim_previsto);
+
   try {
     await pool.query('BEGIN');
 
     const emprestimo = await pool.query(queries.adicionarEmprestimo, [
       usuario_id,
       exemplar_codigo,
-      data_inicio,
-      data_fim_previsto
+      dataInicioFormatada,
+      dataFimPrevistoFormatada
     ]);
 
     await pool.query(queries.atualizarStatusExemplar, [exemplar_codigo]);
@@ -82,7 +103,7 @@ const adicionarEmprestimo = async (req, res) => {
 
 const marcarComoDevolvido = async (req, res) => {
   const { usuario_id, exemplar_codigo, data_inicio } = req.params;
-  const dataFormatada = data_inicio.split('T')[0];  // Garantir o formato 'YYYY-MM-DD'
+  const dataFormatada = formatDate(data_inicio);
 
   try {
     await pool.query('BEGIN');
