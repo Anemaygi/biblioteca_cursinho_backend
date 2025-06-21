@@ -2,55 +2,76 @@ const pool = require('../config/db');
 const queries = require('./queries');
 const { formatarPenalidade } = require('./utils');
 
+const getTipos = async (req, res) => {
+  try {
+    const result = await pool.query("SELECT id, nome FROM penalidade_tipo ORDER BY nome")
+    res.json(result.rows)
+  } catch (err) {
+    console.error("Erro ao buscar tipos:", err)
+    res.status(500).send("Erro ao buscar tipos")
+  }
+}
+
+const getCausas = async (req, res) => {
+  try {
+    const result = await pool.query("SELECT id, nome FROM penalidade_causa ORDER BY nome")
+    res.json(result.rows)
+  } catch (err) {
+    console.error("Erro ao buscar causas:", err)
+    res.status(500).send("Erro ao buscar causas")
+  }
+}
+
+
 const getAll = async (req, res) => {
   try {
     const result = await pool.query(queries.getAll);
-    res.json(result.rows.map(formatarPenalidade));  // Retorna os dados de penalidades em JSON
+    res.json(result.rows.map(formatarPenalidade));
   } catch (err) {
     console.error("Erro ao buscar penalidades:", err);
-    res.status(500).json({ error: 'Erro ao buscar penalidades', details: err.message });  // Retorna erro como JSON
+    res.status(500).send("Erro ao buscar penalidades");
   }
 };
 
 const addPenalidade = async (req, res) => {
-  const { usuario_id, exemplar_codigo, emprestimo_data_inicio, tipo, causa, data_aplicacao, data_suspensao } = req.body;
+  const { usuario_id, exemplar_codigo, emprestimo_data_inicio, tipo_id, causa_id, data_aplicacao, data_suspensao } = req.body;
   try {
     const result = await pool.query(queries.insert, [
       usuario_id,
       exemplar_codigo,
       emprestimo_data_inicio,
+      tipo_id,
+      causa_id,
       data_aplicacao,
       data_suspensao,
-      tipo,
-      causa
     ]);
-    res.status(201).json(formatarPenalidade(result.rows[0]));  // Retorna o sucesso em JSON
+    res.status(201).json(formatarPenalidade(result.rows[0]));
   } catch (err) {
     console.error("Erro ao adicionar penalidade:", err);
-    res.status(500).json({ error: 'Erro ao adicionar penalidade', details: err.message });  // Retorna erro como JSON
+    res.status(500).send("Erro ao adicionar penalidade");
   }
 };
 
 const editPenalidade = async (req, res) => {
   const { usuario_id, exemplar_codigo, emprestimo_data_inicio, data_aplicacao } = req.params;
-  const { tipo, causa, data_suspensao, status } = req.body;
+  const { tipo_id, causa_id, data_suspensao, status_cumprida } = req.body;
 
   try {
     const result = await pool.query(queries.update, [
-      tipo,
-      causa,
+      tipo_id,
+      causa_id,
       data_suspensao,
-      status,
+      status_cumprida,
       usuario_id,
       exemplar_codigo,
       emprestimo_data_inicio,
-      data_aplicacao
+      data_aplicacao,
     ]);
-    if (result.rowCount === 0) return res.status(404).json({ error: 'Penalidade não encontrada' });  // Retorna erro se não encontrar
-    res.json(formatarPenalidade(result.rows[0]));  // Retorna os dados atualizados em JSON
+    if (result.rowCount === 0) return res.status(404).send("Penalidade não encontrada");
+    res.json(formatarPenalidade(result.rows[0]));
   } catch (err) {
     console.error("Erro ao editar penalidade:", err);
-    res.status(500).json({ error: 'Erro ao editar penalidade', details: err.message });  // Retorna erro como JSON
+    res.status(500).send("Erro ao editar penalidade");
   }
 };
 
@@ -61,13 +82,13 @@ const removePenalidade = async (req, res) => {
       usuario_id,
       exemplar_codigo,
       emprestimo_data_inicio,
-      data_aplicacao
+      data_aplicacao,
     ]);
-    if (result.rowCount === 0) return res.status(404).json({ error: 'Penalidade não encontrada' });  // Retorna erro se não encontrar
-    res.status(200).json({ message: 'Penalidade removida com sucesso' });  // Retorna sucesso
+    if (result.rowCount === 0) return res.status(404).send("Penalidade não encontrada");
+    res.send("Penalidade removida com sucesso");
   } catch (err) {
     console.error("Erro ao remover penalidade:", err);
-    res.status(500).json({ error: 'Erro ao remover penalidade', details: err.message });  // Retorna erro como JSON
+    res.status(500).send("Erro ao remover penalidade");
   }
 };
 
@@ -78,6 +99,35 @@ const marcarCumprida = async (req, res) => {
       usuario_id,
       exemplar_codigo,
       emprestimo_data_inicio,
-      data_aplicacao
+      data_aplicacao,
     ]);
-    if (result.rowCount === 0) return res.status(404).json({ error: 'Penalidade não encontrada' });
+    if (result.rowCount === 0) return res.status(404).send("Penalidade não encontrada");
+    res.json(formatarPenalidade(result.rows[0]));
+  } catch (err) {
+    console.error("Erro ao marcar penalidade como cumprida:", err);
+    res.status(500).send("Erro ao atualizar penalidade");
+  }
+};
+
+const getByUsuario = async (req, res) => {
+  const { usuario_id } = req.params;
+  try {
+    const result = await pool.query(queries.getByUsuario, [usuario_id]);
+    res.json(result.rows.map(formatarPenalidade));
+  } catch (err) {
+    console.error("Erro ao buscar penalidades por usuário:", err);
+    res.status(500).send("Erro ao buscar penalidades");
+  }
+};
+
+module.exports = {
+  // já existentes:
+  getAll,
+  addPenalidade,
+  editPenalidade,
+  removePenalidade,
+  marcarCumprida,
+  getByUsuario,
+  getTipos,
+  getCausas,
+}
