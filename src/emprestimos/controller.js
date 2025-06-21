@@ -13,7 +13,7 @@ const getAll = async (req, res) => {
 
 const deleteEmprestimo = async (req, res) => {
   const { usuario_id, exemplar_codigo, data_inicio } = req.params;
-  const dataFormatada = data_inicio.split('T')[0];
+  const dataFormatada = data_inicio.split('T')[0];  // Garantir que a data esteja no formato 'YYYY-MM-DD'
 
   try {
     const result = await pool.query(queries.deleteEmprestimo, [
@@ -35,7 +35,7 @@ const deleteEmprestimo = async (req, res) => {
 
 const renovarEmprestimo = async (req, res) => {
   const { usuario_id, exemplar_codigo, data_inicio } = req.params;
-  const dataFormatada = data_inicio.split('T')[0];
+  const dataFormatada = data_inicio.split('T')[0];  // Garantir o formato 'YYYY-MM-DD'
 
   try {
     const result = await pool.query(queries.renovarEmprestimo, [
@@ -82,7 +82,7 @@ const adicionarEmprestimo = async (req, res) => {
 
 const marcarComoDevolvido = async (req, res) => {
   const { usuario_id, exemplar_codigo, data_inicio } = req.params;
-  const dataFormatada = data_inicio.split('T')[0];
+  const dataFormatada = data_inicio.split('T')[0];  // Garantir o formato 'YYYY-MM-DD'
 
   try {
     await pool.query('BEGIN');
