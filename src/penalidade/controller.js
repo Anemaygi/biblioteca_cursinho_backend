@@ -4,24 +4,23 @@ const { formatarPenalidade } = require('./utils');
 
 const getTipos = async (req, res) => {
   try {
-    const result = await pool.query("SELECT id, nome FROM penalidade_tipo ORDER BY nome")
-    res.json(result.rows)
+    const result = await pool.query("SELECT id, nome FROM penalidade_tipo ORDER BY nome");
+    res.json(result.rows);
   } catch (err) {
-    console.error("Erro ao buscar tipos:", err)
-    res.status(500).send("Erro ao buscar tipos")
+    console.error("Erro ao buscar tipos:", err);
+    res.status(500).send("Erro ao buscar tipos");
   }
-}
+};
 
 const getCausas = async (req, res) => {
   try {
-    const result = await pool.query("SELECT id, nome FROM penalidade_causa ORDER BY nome")
-    res.json(result.rows)
+    const result = await pool.query("SELECT id, nome FROM penalidade_causa ORDER BY nome");
+    res.json(result.rows);
   } catch (err) {
-    console.error("Erro ao buscar causas:", err)
-    res.status(500).send("Erro ao buscar causas")
+    console.error("Erro ao buscar causas:", err);
+    res.status(500).send("Erro ao buscar causas");
   }
-}
-
+};
 
 const getAll = async (req, res) => {
   try {
@@ -40,10 +39,10 @@ const addPenalidade = async (req, res) => {
       usuario_id,
       exemplar_codigo,
       emprestimo_data_inicio,
-      tipo_id,
-      causa_id,
       data_aplicacao,
       data_suspensao,
+      tipo_id,
+      causa_id
     ]);
     res.status(201).json(formatarPenalidade(result.rows[0]));
   } catch (err) {
@@ -121,7 +120,6 @@ const getByUsuario = async (req, res) => {
 };
 
 module.exports = {
-  // já existentes:
   getAll,
   addPenalidade,
   editPenalidade,
@@ -130,4 +128,4 @@ module.exports = {
   getByUsuario,
   getTipos,
   getCausas,
-}
+};

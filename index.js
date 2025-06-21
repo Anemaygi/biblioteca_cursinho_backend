@@ -7,7 +7,7 @@ const livrosRoutes = require('./src/livros/routes')
 const exemplaresRoutes = require('./src/exemplares/routes')
 const loginRoutes = require('./src/login/routes')
 const autoresRoutes = require('./src/autores/routes');
-const penalidadesRoutes = require('./src/penalidades/routes');
+const penalidadesRoutes = require('./src/penalidade/routes');
 const reservasRoutes = require('./src/reservas/routes');
 const emprestimosRoutes = require('./src/emprestimos/routes')
 
