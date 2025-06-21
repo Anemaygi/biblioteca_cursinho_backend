@@ -4,7 +4,7 @@ const getAll = `
   JOIN usuario u ON p.fk_usuario_id = u.id
   JOIN emprestimo e ON p.fk_usuario_id = e.fk_usuario_id
                    AND p.fk_livro_id = e.fk_livro_id
-                   AND p.fk_emprestimo_data_inicio = e.data_inicio
+                   AND p.fk_emprestimo_data_inicio = e.data_inicio::date
   JOIN livro l ON p.fk_livro_id = l.id
   ORDER BY p.data_aplicada DESC;
 `;
