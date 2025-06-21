@@ -40,7 +40,7 @@ const addPenalidade = async (req, res) => {
       exemplar_codigo,
       emprestimo_data_inicio,
       data_aplicacao,
-      data_suspensao,
+      data_suspensao || null,
       tipo_id,
       causa_id
     ]);
@@ -60,7 +60,7 @@ const editPenalidade = async (req, res) => {
       tipo_id,
       causa_id,
       data_suspensao,
-      status_cumprida,
+      status_cumprida ? 'Cumprida' : 'Pendente',
       usuario_id,
       exemplar_codigo,
       emprestimo_data_inicio,
@@ -93,13 +93,18 @@ const removePenalidade = async (req, res) => {
 
 const marcarCumprida = async (req, res) => {
   const { usuario_id, exemplar_codigo, emprestimo_data_inicio, data_aplicacao } = req.params;
+  const hoje = new Date().toISOString().split('T')[0];
+
   try {
-    const result = await pool.query(queries.markCumprida, [
-      usuario_id,
-      exemplar_codigo,
-      emprestimo_data_inicio,
-      data_aplicacao,
-    ]);
+    const result = await pool.query(`
+      UPDATE penalidade
+      SET status = TRUE,
+          "data_suspensão" = COALESCE("data_suspensão", $5)
+      WHERE "fk_usuário_id" = $1 AND "fk_livro_id" = $2 
+        AND "fk_empréstimo_data_início" = $3 AND "data_aplicada" = $4
+      RETURNING *;
+    `, [usuario_id, exemplar_codigo, emprestimo_data_inicio, data_aplicacao, hoje]);
+
     if (result.rowCount === 0) return res.status(404).send("Penalidade não encontrada");
     res.json(formatarPenalidade(result.rows[0]));
   } catch (err) {
