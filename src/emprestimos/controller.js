@@ -87,13 +87,25 @@ const marcarComoDevolvido = async (req, res) => {
   try {
     await pool.query('BEGIN');
 
-    await pool.query(queries.marcarComoDevolvido, [
+    const result = await pool.query(queries.marcarComoDevolvido, [
       usuario_id,
       exemplar_codigo,
       dataFormatada
     ]);
+    
+    if (result.rowCount === 0) {
+      await pool.query('ROLLBACK');
+      return res.status(404).send("Empréstimo não encontrado para devolução");
+    }
+    
+    await pool.query(`
+      UPDATE exemplar
+      SET status_disponibilidade = TRUE
+      WHERE codigo = $1
+    `, [exemplar_codigo]);
+    
+    await pool.query('COMMIT');    
 
-    await pool.query('COMMIT');
 
     res.status(200).send("Empréstimo marcado como devolvido");
   } catch (err) {
